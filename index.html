@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宜宾两天一夜</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:#0a0a0c;
+  color:#f0f0f0;
+  overflow-x:hidden;
+  line-height:1.6;
+}
+img { display:block; max-width:100%; }
+
+/* hero */
+.hero {
+  position:relative;
+  height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  text-align:center;
+  overflow:hidden;
+}
+.hero-bg {
+  position:absolute;inset:0;
+  background:url('https://images.unsplash.com/photo-1470004914212-05527e49370b?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+  transform:scale(1.05);
+  animation: kenburns 20s ease-in-out infinite alternate;
+}
+.hero-overlay {
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(10,10,12,0.3) 0%,rgba(10,10,12,0.7) 60%,#0a0a0c 100%);
+}
+.hero h1 {
+  font-size:clamp(2.8rem,9vw,6rem);
+  font-weight:900;
+  letter-spacing:-0.03em;
+  line-height:1.05;
+  z-index:2;
+  opacity:0;
+  text-shadow:0 4px 30px rgba(0,0,0,0.5);
+  animation: fadeUp 1.2s cubic-bezier(0.22,1,0.36,1) 0.3s forwards;
+}
+.hero h1 span { color:#00e5c9; }
+.hero .sub {
+  font-size:clamp(1rem,2.5vw,1.4rem);
+  color:rgba(255,255,255,0.75);
+  margin-top:1.2rem;
+  z-index:2;
+  opacity:0;
+  font-weight:300;
+  letter-spacing:0.05em;
+  animation: fadeUp 1.2s cubic-bezier(0.22,1,0.36,1) 0.6s forwards;
+}
+.hero .date {
+  font-size:0.8rem;
+  color:rgba(255,255,255,0.4);
+  margin-top:0.8rem;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  z-index:2;
+  opacity:0;
+  animation: fadeUp 1.2s cubic-bezier(0.22,1,0.36,1) 0.8s forwards;
+}
+.scroll-hint {
+  position:absolute;
+  bottom:2.5rem;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;
+  gap:0.5rem;
+  z-index:2;
+  opacity:0;
+  animation: fadeUp 1s ease 1.4s forwards;
+}
+.scroll-hint span { font-size:0.65rem; color:rgba(255,255,255,0.35); letter-spacing:0.25em; }
+.scroll-hint .arrow {
+  width:1.1rem;height:1.1rem;
+  border-right:2px solid #00e5c9;
+  border-bottom:2px solid #00e5c9;
+  transform:rotate(45deg);
+  animation: bounce 2.2s infinite;
+}
+
+/* cards */
+.cards {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:1.8rem;
+  max-width:1100px;
+  margin:0 auto;
+  padding:7rem 2rem;
+}
+.card {
+  position:relative;
+  background:#14141b;
+  border-radius:28px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.5s ease;
+  border:1px solid rgba(255,255,255,0.04);
+  opacity:0;
+  animation: fadeUp 0.9s ease forwards;
+}
+.card:nth-child(1){animation-delay:0.15s}
+.card:nth-child(2){animation-delay:0.35s}
+.card:hover {
+  transform:translateY(-10px) scale(1.01);
+  box-shadow:0 32px 80px rgba(0,229,201,0.1);
+  border-color:rgba(0,229,201,0.2);
+}
+.card-img {
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  transition:transform 0.7s ease;
+}
+.card:hover .card-img { transform:scale(1.08); }
+.card-body { padding:1.8rem 2rem 2.2rem; position:relative; }
+.card .tag {
+  position:absolute;
+  top:-14px;left:2rem;
+  padding:0.35rem 1rem;
+  border-radius:999px;
+  font-size:0.7rem;
+  font-weight:800;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+.card:nth-child(1) .tag { background:#00e5c9; color:#0a0a0c; }
+.card:nth-child(2) .tag { background:#ff6b6b; color:#fff; }
+.card h2 { font-size:1.5rem; font-weight:800; margin-bottom:0.5rem; }
+.card p.desc { color:#888; font-size:0.92rem; margin-bottom:1.3rem; line-height:1.6; }
+.card .meta {
+  display:flex;gap:1.2rem;
+  font-size:0.78rem;
+  color:#555;
+}
+.card .meta span { display:flex;align-items:center;gap:0.35rem; }
+.card .arrow-icon {
+  position:absolute;
+  bottom:2rem;right:2rem;
+  width:2.2rem;height:2.2rem;
+  border-radius:50%;
+  background:rgba(255,255,255,0.04);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
+  transition:all 0.3s ease;
+}
+.card:hover .arrow-icon { background:rgba(0,229,201,0.15); color:#00e5c9; transform:translateX(5px); }
+
+/* detail page */
+.page {
+  display:none;
+  min-height:100vh;
+  animation: fadeIn 0.6s ease;
+}
+.page.active { display:block; }
+.page-hero {
+  position:relative;
+  height:55vh;
+  min-height:380px;
+  overflow:hidden;
+}
+.page-hero img {
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  animation: kenburns 18s ease-in-out infinite alternate;
+}
+.page-hero .overlay {
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(10,10,12,0.2) 0%,rgba(10,10,12,0.85) 100%);
+}
+.page-hero-content {
+  position:absolute;
+  bottom:0;left:0;right:0;
+  padding:0 2rem 2.5rem;
+  max-width:900px;
+  margin:0 auto;
+}
+.back-btn {
+  display:inline-flex;align-items:center;gap:0.5rem;
+  color:rgba(255,255,255,0.5);
+  font-size:0.82rem;
+  cursor:pointer;
+  transition:all 0.3s ease;
+  margin-bottom:1rem;
+  padding:0.4rem 0.9rem;
+  border-radius:999px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.06);
+}
+.back-btn:hover { color:#00e5c9; background:rgba(0,229,201,0.08); border-color:rgba(0,229,201,0.15); }
+.page-hero-content h2 {
+  font-size:clamp(1.8rem,5vw,2.8rem);
+  font-weight:900;
+  margin-bottom:0.4rem;
+  text-shadow:0 2px 20px rgba(0,0,0,0.5);
+}
+.page-hero-content .subtitle { color:rgba(255,255,255,0.55); font-size:1rem; }
+
+.timeline {
+  max-width:900px;
+  margin:0 auto;
+  padding:3rem 2rem 5rem;
+  position:relative;
+}
+.timeline::before {
+  content:"";
+  position:absolute;
+  left:2.4rem;
+  top:0;bottom:0;
+  width:2px;
+  background:linear-gradient(180deg,#00e5c9 0%,rgba(0,229,201,0.1) 80%,transparent 100%);
+}
+.item {
+  position:relative;
+  padding-left:3.8rem;
+  padding-bottom:3rem;
+  opacity:0;
+  animation: fadeLeft 0.7s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.item:nth-child(1){animation-delay:0.1s}
+.item:nth-child(2){animation-delay:0.2s}
+.item:nth-child(3){animation-delay:0.3s}
+.item:nth-child(4){animation-delay:0.4s}
+.item:nth-child(5){animation-delay:0.5s}
+.item:nth-child(6){animation-delay:0.6s}
+.item:nth-child(7){animation-delay:0.7s}
+.item:nth-child(8){animation-delay:0.8s}
+.dot {
+  position:absolute;
+  left:1.85rem;top:0.3rem;
+  width:1.15rem;height:1.15rem;
+  border-radius:50%;
+  background:#0a0a0c;
+  border:3px solid #00e5c9;
+  z-index:2;
+  box-shadow:0 0 0 4px rgba(0,229,201,0.08);
+}
+.time {
+  font-size:0.78rem;
+  font-weight:700;
+  color:#00e5c9;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  margin-bottom:0.35rem;
+}
+.item h3 { font-size:1.15rem; font-weight:800; margin-bottom:0.35rem; }
+.item p { color:#999; font-size:0.9rem; line-height:1.65; }
+.item .tip {
+  margin-top:0.9rem;
+  padding:1rem 1.2rem;
+  background:rgba(0,229,201,0.04);
+  border-left:3px solid #00e5c9;
+  border-radius:0 12px 12px 0;
+  font-size:0.85rem;
+  color:#bbb;
+  line-height:1.6;
+}
+.item-img {
+  margin-top:1rem;
+  width:100%;max-width:480px;
+  height:180px;
+  object-fit:cover;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.05);
+  opacity:0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+/* tips */
+.tips {
+  max-width:900px;
+  margin:0 auto 5rem;
+  padding:0 2rem;
+}
+.tips-box {
+  background:#14141b;
+  border-radius:24px;
+  padding:2.2rem;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.tips-box h3 {
+  font-size:1.05rem;
+  margin-bottom:1.2rem;
+  display:flex;align-items:center;gap:0.5rem;
+  font-weight:800;
+}
+.tips-box ul { list-style:none; }
+.tips-box li {
+  padding:0.6rem 0;
+  color:#999;
+  font-size:0.9rem;
+  display:flex;gap:0.8rem;
+  line-height:1.6;
+}
+.tips-box li::before {
+  content:"→";
+  color:#00e5c9;
+  font-weight:bold;
+  flex-shrink:0;
+}
+
+@keyframes fadeUp {
+  from { opacity:0;transform:translateY(30px); }
+  to   { opacity:1;transform:translateY(0); }
+}
+@keyframes fadeLeft {
+  from { opacity:0;transform:translateX(-25px); }
+  to   { opacity:1;transform:translateX(0); }
+}
+@keyframes fadeIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+@keyframes bounce {
+  0%,100% { transform:translateY(0) rotate(45deg); }
+  50%     { transform:translateY(8px) rotate(45deg); }
+}
+@keyframes kenburns {
+  from { transform:scale(1.05); }
+  to   { transform:scale(1.18); }
+}
+
+@media (max-width:640px){
+  .cards { padding:4rem 1.2rem; gap:1.2rem; }
+  .card-img { height:180px; }
+  .card-body { padding:1.6rem 1.4rem 2rem; }
+  .page-hero { height:45vh; min-height:300px; }
+  .page-hero-content { padding:0 1.2rem 1.8rem; }
+  .timeline { padding:2rem 1.2rem 3rem; }
+  .timeline::before { left:1.6rem; }
+  .dot { left:1.05rem; width:1rem;height:1rem; border-width:2.5px; }
+  .item { padding-left:3rem; }
+  .item-img { height:140px; }
+  .tips { padding:0 1.2rem; margin-bottom:3rem; }
+  .tips-box { padding:1.6rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<section id="home">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <h1>宜宾<span>两天一夜</span></h1>
+    <p class="sub">三江汇流 · 竹海寻幽 · 酒都寻味</p>
+    <p class="date">May Trip</p>
+    <div class="scroll-hint">
+      <span>SCROLL</span>
+      <div class="arrow"></div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card" onclick="openPage('day1')">
+      <img class="card-img" src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=800&q=80" alt="李庄古镇">
+      <div class="card-body">
+        <span class="tag">Day 1</span>
+        <h2>古镇酒都 · 夜游老城</h2>
+        <p class="desc">李庄古镇、五粮液景区、冠英古街夜游、三江汇流日落</p>
+        <div class="meta">
+          <span>📍 李庄 · 五粮液 · 合江门</span>
+          <span>🍜 燃面 · 把把烧 · 白肉</span>
+        </div>
+        <div class="arrow-icon">→</div>
+      </div>
+    </div>
+    <div class="card" onclick="openPage('day2')">
+      <img class="card-img" src="https://images.unsplash.com/photo-1596324608967-d436251be5e9?auto=format&fit=crop&w=800&q=80" alt="蜀南竹海">
+      <div class="card-body">
+        <span class="tag">Day 2</span>
+        <h2>蜀南竹海 · 市区漫步</h2>
+        <p class="desc">翡翠长廊、海中海、全竹宴、大观楼 / 翠屏山</p>
+        <div class="meta">
+          <span>📍 蜀南竹海 · 大观楼</span>
+          <span>🎋 竹筒饭 · 竹荪鸡 · 竹菌</span>
+        </div>
+        <div class="arrow-icon">→</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DAY1 -->
+<section id="day1" class="page">
+  <div class="page-hero">
+    <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1600&q=80" alt="夜景">
+    <div class="overlay"></div>
+    <div class="page-hero-content">
+      <div class="back-btn" onclick="goHome()">← 返回首页</div>
+      <h2>Day 1 · 古镇酒都 · 夜游老城</h2>
+      <p class="subtitle">李庄古镇 → 五粮液景区 → 冠英古街 → 三江汇流</p>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">09:00 – 11:30</div>
+      <h3>前往【李庄古镇】+ 古镇核心区游览</h3>
+      <p>席子巷、张家祠、东岳庙，古朴老街，漫步其中感受岁月沉淀</p>
+      <img class="item-img" src="https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=800&q=80" alt="古镇">
+      <div class="tip">✅ 必吃：李庄白肉、李庄白糕 · 古镇全天免费</div>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">11:30 – 13:00</div>
+      <h3>李庄古镇午餐</h3>
+      <p>川南农家菜，清淡适口，竹荪鲜汤、农家小炒</p>
+      <img class="item-img" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80" alt="美食">
+      <div class="tip">推荐：竹荪鲜汤、农家小炒，人均 ¥50</div>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">13:00 – 13:40</div>
+      <h3>车程前往五粮液景区</h3>
+      <p>短途休整，沿途吹吹风，期待酒文化之旅</p>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">13:40 – 16:00</div>
+      <h3>【五粮液旅游景区】参观</h3>
+      <p>巨型酒瓶大门、酒文化博物馆、酒圣山远眺，酒都魅力一览无遗</p>
+      <img class="item-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&w=800&q=80" alt="酒文化">
+      <div class="tip">免费入园，必带身份证，可尝五粮液文创冰淇淋</div>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">16:00 – 17:30</div>
+      <h3>前往合江门，散步等候日落</h3>
+      <p>金沙江 + 岷江 + 长江三江汇流，长江零公里地标</p>
+      <img class="item-img" src="https://images.unsplash.com/photo-1470004914212-05527e49370b?auto=format&fit=crop&w=800&q=80" alt="三江汇流">
+      <div class="tip">江边吹风，适合拍照看晚霞</div>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">17:30 – 19:30</div>
+      <h3>【冠英古街】闲逛夜游</h3>
+      <p>民国风老街、灯笼夜景、文创小店，感受宜宾夜晚的烟火气</p>
+      <img class="item-img" src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80" alt="古街夜景">
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">19:30 – 21:00</div>
+      <h3>老城晚餐 + 本地小吃</h3>
+      <p>宜宾烟火气拉满，从燃面到把把烧，每一口都是本地味道</p>
+      <img class="item-img" src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80" alt="晚餐">
+      <div class="tip">✅ 必吃：正宗宜宾燃面、川式把把烧</div>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">21:00 后</div>
+      <h3>返回酒店入住休息</h3>
+      <p>推荐住在合江门 / 冠英古街附近，出行、夜景、吃饭都方便</p>
+      <div class="tip">就近落脚，方便次日出行</div>
+    </div>
+  </div>
+</section>
+
+<!-- DAY2 -->
+<section id="day2" class="page">
+  <div class="page-hero">
+    <img src="https://images.unsplash.com/photo-1596324608967-d436251be5e9?auto=format&fit=crop&w=1600&q=80" alt="竹海">
+    <div class="overlay"></div>
+    <div class="page-hero-content">
+      <div class="back-btn" onclick="goHome()">← 返回首页</div>
+      <h2>Day 2 · 蜀南竹海 · 市区漫步</h2>
+      <p class="subtitle">蜀南竹海 → 全竹宴 → 大观楼 / 翠屏山</p>
+    </div>
+  </div>
+  <div class="timeline">
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">08:00 – 08:40</div>
+      <h3>早餐 + 出发前往蜀南竹海</h3>
+      <p>简单早餐，早点出发避开人流，开启竹海一天</p>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">08:40 – 12:00</div>
+      <h3>蜀南竹海核心游玩</h3>
+      <p>翡翠长廊、海中海、忘忧谷，《卧虎藏龙》取景地，万顷碧波令人沉醉</p>
+      <img class="item-img" src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=800&q=80" alt="竹林">
+      <div class="tip">门票约 ¥100，竹林阴凉，记得喷驱蚊液</div>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">12:00 – 13:30</div>
+      <h3>竹海农家乐午餐</h3>
+      <p>山林原生态风味，全竹宴让你一次尝遍竹的百般滋味</p>
+      <img class="item-img" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80" alt="全竹宴">
+      <div class="tip">✅ 全竹宴：竹筒饭、竹荪鸡、炒竹菌，人均 ¥60</div>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">13:30 – 15:00</div>
+      <h3>返程回宜宾市区</h3>
+      <p>车程放松，慢慢回城，回味竹海余韵</p>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">15:00 – 16:30</div>
+      <h3>市区打卡：大观楼 / 翠屏山（二选一）</h3>
+      <p>城市地标，短途散步消食，为行程画上轻松句号</p>
+      <img class="item-img" src="https://images.unsplash.com/photo-1590051425218-c394b11509de?auto=format&fit=crop&w=800&q=80" alt="市区">
+      <div class="tip">免费游玩，轻松收尾</div>
+    </div>
+    <div class="item">
+      <div class="dot"></div>
+      <div class="time">16:30 以后</div>
+      <h3>自由逛买伴手礼 + 返程</h3>
+      <p>采购燃面调料、竹制小纪念品，把宜宾的味道带回家</p>
+      <div class="tip">行程结束，不赶时间</div>
+    </div>
+  </div>
+
+  <div class="tips">
+    <div class="tips-box">
+      <h3>💡 补充小提示</h3>
+      <ul>
+        <li>5 月中旬宜宾气温舒适，早晚微凉，备薄外套；竹海植被密，防晒 + 驱蚊必备</li>
+        <li>市区→蜀南竹海车程约 40 分钟，多人同行建议拼车 / 打车，比公交省心</li>
+        <li>全程节奏舒缓，可随时放慢节奏，适合短途散心出游</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+function openPage(id){
+  document.getElementById('home').style.display='none';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('home').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+
+</body>
+</html>
